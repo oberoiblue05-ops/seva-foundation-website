@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { FieldValue } from "firebase-admin/firestore";
-import { adminDb } from "@/lib/firebase-admin";
+import { getAdminDb } from "@/lib/firebase-admin";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const rawBody = await req.text();
+    const rawBody  = await req.text();
     const signature = req.headers.get("x-razorpay-signature") ?? "";
 
     const expected = crypto
@@ -21,36 +20,32 @@ export async function POST(req: NextRequest) {
 
     const event = JSON.parse(rawBody) as {
       event: string;
-      payload: {
-        payment?: { entity: { id: string; order_id: string } };
-      };
+      payload: { payment?: { entity: { id: string; order_id: string } } };
     };
 
     const payment = event.payload?.payment?.entity;
-    if (!payment?.order_id) {
-      return NextResponse.json({ received: true });
-    }
+    if (payment?.order_id) {
+      const { id: paymentId, order_id: orderId } = payment;
 
-    const { id: paymentId, order_id: orderId } = payment;
-
-    if (event.event === "payment.captured") {
-      await adminDb.collection("donations").doc(orderId).update({
-        razorpayPaymentId: paymentId,
-        status:            "success",
-        capturedAt:        FieldValue.serverTimestamp(),
-      });
-    } else if (event.event === "payment.failed") {
-      await adminDb.collection("donations").doc(orderId).update({
-        razorpayPaymentId: paymentId,
-        status:            "failed",
-        failedAt:          FieldValue.serverTimestamp(),
-      });
+      if (event.event === "payment.captured") {
+        await getAdminDb().collection("donations").doc(orderId).update({
+          razorpayPaymentId: paymentId,
+          status:            "success",
+          capturedAt:        new Date().toISOString(),
+        });
+      } else if (event.event === "payment.failed") {
+        await getAdminDb().collection("donations").doc(orderId).update({
+          razorpayPaymentId: paymentId,
+          status:            "failed",
+          failedAt:          new Date().toISOString(),
+        });
+      }
     }
 
     return NextResponse.json({ received: true });
-  } catch (err) {
-    console.error("[webhook]", err);
-    // Always return 200 to Razorpay so they don't retry
+  } catch (error: unknown) {
+    console.error("[webhook]", error);
+    // Always 200 so Razorpay doesn't retry
     return NextResponse.json({ received: true });
   }
 }

@@ -38,9 +38,7 @@ const HeroSection = dynamic(() => import("@/components/home/HeroSection"), {
   loading: () => <SectionSkeleton dark />,
 });
 
-// Client-only (CountUp + Firestore fetch)
 const ImpactCounters = dynamic(() => import("@/components/home/ImpactCounters"), {
-  ssr: false,
   loading: () => <SectionSkeleton dark />,
 });
 
@@ -48,9 +46,7 @@ const MissionSection = dynamic(() => import("@/components/home/MissionSection"),
   loading: () => <SectionSkeleton />,
 });
 
-// Client-only (drag carousel + auto-advance)
 const LatestActivities = dynamic(() => import("@/components/home/LatestActivities"), {
-  ssr: false,
   loading: () => <SectionSkeleton dark />,
 });
 

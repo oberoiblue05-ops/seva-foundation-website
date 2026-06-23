@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,24 +16,35 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Seva Group Foundation — Changing Lives, One Step at a Time",
+  title: {
+    default: "Seva Group Foundation | Nourishing Lives, Building Futures",
+    template: "%s | Seva Group Foundation",
+  },
   description:
-    "Seva Group Foundation is a registered NGO in Noida, UP, India dedicated to supporting orphans, senior citizens, street children, widows, and underprivileged communities.",
+    "Registered NGO serving orphaned children, elderly, widows in NCR since 2018. Donate, volunteer or sponsor a child today.",
   keywords: [
     "NGO India",
     "Seva Group Foundation",
     "donate India",
     "orphan support Noida",
     "charity UP India",
+    "volunteer Noida",
+    "sponsor a child India",
   ],
   metadataBase: new URL("https://sevagroupfdn.org"),
   openGraph: {
-    title: "Seva Group Foundation",
-    description: "Registered NGO helping children, elders & communities in Noida, UP.",
+    title: "Seva Group Foundation | Nourishing Lives, Building Futures",
+    description:
+      "Registered NGO serving orphaned children, elderly & widows in NCR since 2018.",
     url: "https://sevagroupfdn.org",
     siteName: "Seva Group Foundation",
     locale: "en_IN",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Seva Group Foundation",
+    description: "Registered NGO — Noida UP. Donate, volunteer, or sponsor a child.",
   },
 };
 
@@ -43,7 +55,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-background text-text">{children}</body>
+      <body className="min-h-full flex flex-col bg-background text-text">
+        {children}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "#1B5E37",
+              color: "#fff",
+              borderRadius: "12px",
+              fontSize: "14px",
+            },
+            success: {
+              iconTheme: { primary: "#F5A623", secondary: "#1B5E37" },
+            },
+            error: {
+              style: { background: "#7f1d1d" },
+            },
+          }}
+        />
+      </body>
     </html>
   );
 }

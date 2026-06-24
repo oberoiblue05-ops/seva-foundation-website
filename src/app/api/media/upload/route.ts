@@ -5,25 +5,41 @@ import { getAdminDb } from "@/lib/firebase-admin";
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    const file     = formData.get("file") as File | null;
+    const file = formData.get("file") as File | null;
 
-    if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    if (!file) {
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
 
     const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
     if (!allowed.includes(file.type)) {
-      return NextResponse.json({ error: "Only JPEG, PNG, WebP and GIF allowed" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Only JPEG, PNG, WebP and GIF are allowed" },
+        { status: 400 }
+      );
     }
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json({ error: "File exceeds 10 MB limit" }, { status: 400 });
     }
 
-    const buffer  = Buffer.from(await file.arrayBuffer());
-    const dataUri = `data:${file.type};base64,${buffer.toString("base64")}`;
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-    const result = await cloudinary.uploader.upload(dataUri, {
-      folder:        "seva-foundation",
-      resource_type: "image",
-      transformation: [{ quality: "auto", fetch_format: "auto" }],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await new Promise<any>((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "seva-foundation",
+            resource_type: "image",
+            transformation: [{ quality: "auto", fetch_format: "auto" }],
+          },
+          (error, uploadResult) => {
+            if (error) reject(error);
+            else resolve(uploadResult);
+          }
+        )
+        .end(buffer);
     });
 
     const meta = {
@@ -39,9 +55,9 @@ export async function POST(req: NextRequest) {
     const docRef = await getAdminDb().collection("media").add(meta);
 
     return NextResponse.json({ id: docRef.id, ...meta });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Upload failed";
-    console.error("[media/upload]", err);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Upload failed";
+    console.error("[media/upload]", error);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

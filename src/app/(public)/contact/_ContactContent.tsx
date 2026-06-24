@@ -1,12 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
-import { MapPin, Phone, Mail, Clock, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { Mail, Phone, MapPin, Clock, ChevronRight, Send, Users } from "lucide-react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-// ─── Constants ─────────────────────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const WA_NUMBER = "918287061147";
+const WA_BASE   = `https://wa.me/${WA_NUMBER}`;
+const PHONE_DISPLAY = "+91 82870 61147";
+const EMAIL     = "contact@sevagroupfdn.org";
+const MAPS_URL  = "https://maps.google.com/?q=Seva+Group+Foundation+Noida+Extension";
 
 const CATEGORIES = [
   "General Enquiry",
@@ -15,7 +21,9 @@ const CATEGORIES = [
   "Corporate CSR",
   "Media / Press",
   "Report a Child in Need",
-] as const;
+];
+
+const HOW_FOUND = ["Google", "Instagram", "Facebook", "Friend / Family", "WhatsApp", "Other"];
 
 interface FormState {
   category: string;
@@ -23,14 +31,15 @@ interface FormState {
   email:    string;
   phone:    string;
   message:  string;
+  howFound: string;
 }
 
-const INITIAL: FormState = { category: "", name: "", email: "", phone: "", message: "" };
+const BLANK: FormState = { category: "", name: "", email: "", phone: "", message: "", howFound: "" };
 
 const INPUT =
   "w-full rounded-xl border border-gray-200 bg-[#F9FBF9] px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#1A1A1A]/35 focus:border-[#1B5E37] focus:outline-none focus:ring-2 focus:ring-[#1B5E37]/20 transition-colors";
 
-// ─── WhatsApp icon (inline SVG — lucide has no brand icons) ────────────────
+// ─── Inline SVGs ─────────────────────────────────────────────────────────────
 
 function WhatsAppIcon({ size = 22 }: { size?: number }) {
   return (
@@ -40,26 +49,31 @@ function WhatsAppIcon({ size = 22 }: { size?: number }) {
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────
+// ─── Main component ───────────────────────────────────────────────────────────
 
-export default function ContactPage() {
-  const [form, setForm]     = useState<FormState>(INITIAL);
-  const [errors, setErrors] = useState<Partial<FormState>>({});
-  const [saving, setSaving] = useState(false);
+export default function ContactContent() {
+  const [form,    setForm]    = useState<FormState>(BLANK);
+  const [errors,  setErrors]  = useState<Partial<Record<keyof FormState, string>>>({});
+  const [saving,  setSaving]  = useState(false);
+  const [success, setSuccess] = useState<"whatsapp" | "email" | null>(null);
 
   const set =
     (key: keyof FormState) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
-      setForm((prev) => ({ ...prev, [key]: e.target.value }));
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      setForm((p) => ({ ...p, [key]: e.target.value }));
+      setErrors((p) => ({ ...p, [key]: undefined }));
+    };
 
   const validate = (): boolean => {
-    const e: Partial<FormState> = {};
-    if (!form.category)                                         e.category = "Please select a category";
-    if (!form.name.trim())                                      e.name     = "Name is required";
-    if (!form.email.trim())                                     e.email    = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))   e.email    = "Enter a valid email";
-    if (!form.phone.trim())                                     e.phone    = "Phone is required";
-    if (form.message.trim().length < 20)                        e.message  = "Message must be at least 20 characters";
+    const e: Partial<Record<keyof FormState, string>> = {};
+    if (!form.category)                                        e.category = "Please select a category";
+    if (!form.name.trim())                                     e.name     = "Full name is required";
+    if (!form.email.trim())                                    e.email    = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email    = "Enter a valid email";
+    if (!form.phone.trim())                                    e.phone    = "Phone number is required";
+    else if (!/^\d{10}$/.test(form.phone.replace(/\s/g, ""))) e.phone    = "Enter a valid 10-digit number";
+    if (!form.message.trim())                                  e.message  = "Message is required";
+    else if (form.message.trim().length < 20)                  e.message  = "Message must be at least 20 characters";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -68,11 +82,10 @@ export default function ContactPage() {
     try {
       await addDoc(collection(db, "contactMessages"), {
         ...form,
-        via: "whatsapp",
-        createdAt: serverTimestamp(),
+        submittedAt: serverTimestamp(),
       });
     } catch {
-      // silently fail — WhatsApp still opens
+      // non-blocking — don't fail the user flow if Firestore is unavailable
     }
   };
 
@@ -80,354 +93,414 @@ export default function ContactPage() {
     if (!validate()) return;
     setSaving(true);
     await saveToFirestore();
-    setSaving(false);
     const text = [
-      `*Seva Group Foundation — Contact Form*`,
-      ``,
+      `*New Contact Message — Seva Group Foundation*`,
       `*Category:* ${form.category}`,
       `*Name:* ${form.name}`,
       `*Email:* ${form.email}`,
       `*Phone:* +91 ${form.phone}`,
-      ``,
-      `*Message:*`,
-      form.message,
-    ].join("\n");
-    window.open(`https://wa.me/918287061147?text=${encodeURIComponent(text)}`, "_blank");
+      `*Message:* ${form.message}`,
+      form.howFound ? `*Found us via:* ${form.howFound}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+    window.open(`${WA_BASE}?text=${encodeURIComponent(text)}`, "_blank");
+    setSaving(false);
+    setSuccess("whatsapp");
+    setForm(BLANK);
   };
 
   const handleEmail = () => {
     if (!validate()) return;
-    const subject = `[${form.category}] Message from ${form.name}`;
-    const body = [
-      `Category: ${form.category}`,
-      `Name: ${form.name}`,
-      `Email: ${form.email}`,
-      `Phone: +91${form.phone}`,
-      ``,
-      `Message:`,
-      form.message,
-    ].join("\n");
-    window.location.href = `mailto:contact@sevagroupfdn.org?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const subject = encodeURIComponent(`[${form.category}] Message from ${form.name}`);
+    const body = encodeURIComponent(
+      `Category: ${form.category}\nName: ${form.name}\nEmail: ${form.email}\nPhone: +91 ${form.phone}\n\nMessage:\n${form.message}${form.howFound ? `\n\nFound us via: ${form.howFound}` : ""}`
+    );
+    window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
+    saveToFirestore();
+    setSuccess("email");
+    setForm(BLANK);
   };
 
   return (
     <main>
-
-      {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-[#1B5E37] to-[#0F3D22] py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <nav className="mb-5 flex items-center gap-2 text-sm text-white/60" aria-label="Breadcrumb">
-            <Link href="/" className="transition-colors hover:text-white">Home</Link>
-            <ChevronRight size={14} />
-            <span className="text-white">Contact</span>
+      {/* ── Hero ──────────────────────────────────────────────────────── */}
+      <section
+        className="relative py-20 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #071a0e 0%, #0F3D22 55%, #1B5E37 100%)" }}
+      >
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 50%, #F5A623 0%, transparent 50%), radial-gradient(circle at 80% 20%, #fff 0%, transparent 40%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-3xl px-4 text-center">
+          <nav className="mb-6 flex items-center justify-center gap-2 text-sm text-white/50">
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <ChevronRight size={13} />
+            <span className="text-white/80">Contact</span>
           </nav>
-          <h1 className="font-heading text-4xl font-bold text-white sm:text-5xl">Get In Touch</h1>
-          <p className="mt-3 text-lg text-white/70">
-            WhatsApp is the fastest way to reach us — we respond within the hour.
+          <h1 className="text-4xl md:text-5xl font-bold text-white font-heading mb-4">
+            Get In Touch
+          </h1>
+          <p className="text-white/70 text-lg max-w-xl mx-auto">
+            WhatsApp is the fastest way to reach us —{" "}
+            <span className="text-[#F5A623] font-semibold">usually 1 hour response</span>
           </p>
         </div>
       </section>
 
-      {/* ── Quick contact buttons ────────────────────────────────── */}
-      <section className="bg-[#F9FBF9] py-10">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="grid gap-4 sm:grid-cols-3">
-
+      {/* ── Quick contact strip ───────────────────────────────────────── */}
+      <section className="bg-white border-b border-gray-100 py-8">
+        <div className="mx-auto max-w-5xl px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* WhatsApp — most prominent */}
             <a
-              href="https://wa.me/918287061147?text=Hello%2C+I+would+like+to+know+more+about+Seva+Group+Foundation"
+              href={`${WA_BASE}?text=${encodeURIComponent("Hello, I would like to know more about Seva Group Foundation")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 rounded-2xl bg-[#25D366] p-5 text-white shadow-lg shadow-[#25D366]/20 transition-all hover:scale-[1.02]"
+              className="flex items-center gap-4 rounded-2xl p-5 text-white transition-all hover:scale-[1.02] hover:shadow-lg active:scale-100"
+              style={{ backgroundColor: "#25D366" }}
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20">
+              <span className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
                 <WhatsAppIcon size={24} />
-              </div>
+              </span>
               <div>
-                <p className="font-bold">Chat on WhatsApp</p>
-                <p className="text-sm text-white/80">+91 82870 61147</p>
+                <p className="font-bold text-base leading-tight">Chat on WhatsApp</p>
+                <p className="text-white/80 text-xs mt-0.5">{PHONE_DISPLAY} — Usually replies in 1 hour</p>
               </div>
             </a>
 
+            {/* Email */}
             <a
-              href="mailto:contact@sevagroupfdn.org"
-              className="flex items-center gap-4 rounded-2xl bg-[#1B5E37] p-5 text-white shadow-lg shadow-[#1B5E37]/20 transition-all hover:scale-[1.02]"
+              href={`mailto:${EMAIL}`}
+              className="flex items-center gap-4 rounded-2xl p-5 text-white transition-all hover:scale-[1.02] hover:shadow-lg active:scale-100"
+              style={{ backgroundColor: "#1B5E37" }}
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20">
+              <span className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
                 <Mail size={24} />
-              </div>
+              </span>
               <div>
-                <p className="font-bold">Send an Email</p>
-                <p className="text-sm text-white/80">contact@sevagroupfdn.org</p>
+                <p className="font-bold text-base leading-tight">Send an Email</p>
+                <p className="text-white/80 text-xs mt-0.5">{EMAIL}</p>
               </div>
             </a>
 
+            {/* Call */}
             <a
               href="tel:+918287061147"
-              className="flex items-center gap-4 rounded-2xl border-2 border-[#1B5E37] bg-white p-5 text-[#1B5E37] shadow-sm transition-all hover:scale-[1.02] hover:bg-[#F9FBF9]"
+              className="flex items-center gap-4 rounded-2xl p-5 border-2 border-[#1B5E37] text-[#1B5E37] transition-all hover:scale-[1.02] hover:bg-[#1B5E37]/5 active:scale-100"
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#1B5E37]/10">
+              <span className="w-12 h-12 rounded-full bg-[#1B5E37]/10 flex items-center justify-center shrink-0">
                 <Phone size={24} />
-              </div>
+              </span>
               <div>
-                <p className="font-bold">Call Us</p>
-                <p className="text-sm text-[#1A1A1A]/55">+91 82870 61147 | Mon–Sat 10AM–6PM</p>
+                <p className="font-bold text-base leading-tight">Call Us</p>
+                <p className="text-[#1B5E37]/70 text-xs mt-0.5">{PHONE_DISPLAY} | Mon–Sat 10AM–6PM</p>
               </div>
             </a>
-
           </div>
         </div>
       </section>
 
-      {/* ── Two-column layout ────────────────────────────────────── */}
-      <section className="bg-[#F9FBF9] py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
+      {/* ── Two-column: form + info ───────────────────────────────────── */}
+      <section className="bg-[#F9FBF9] py-14">
+        <div className="mx-auto max-w-5xl px-4">
+          <div className="grid lg:grid-cols-2 gap-10">
 
-            {/* LEFT — Contact Form */}
-            <div className="rounded-2xl bg-white p-8 shadow-sm">
-              <h2 className="mb-6 font-heading text-2xl font-bold text-[#0F3D22]">Send Us a Message</h2>
+            {/* ── Left: Contact form ──────────────────────────────── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
+              <h2 className="text-xl font-bold text-[#0F3D22] mb-1 font-heading">Send Us a Message</h2>
+              <p className="text-sm text-gray-500 mb-7">
+                Fill the form below — then send via WhatsApp or Email, whichever you prefer.
+              </p>
 
-              <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+              {success && (
+                <div className="mb-6 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 font-medium">
+                  {success === "whatsapp"
+                    ? "✓ Message opened in WhatsApp and saved. We'll reply within 1 hour."
+                    : "✓ Email client opened. We've also saved your message."}
+                </div>
+              )}
 
+              <div className="space-y-4">
                 {/* Category */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-[#1A1A1A]">
-                    Category <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                    How can we help? *
                   </label>
                   <select value={form.category} onChange={set("category")} className={INPUT}>
                     <option value="">Select a category…</option>
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
+                    {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                   </select>
                   {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category}</p>}
                 </div>
 
-                {/* Name + Email */}
-                <div className="grid gap-4 sm:grid-cols-2">
+                {/* Name */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Your full name"
+                    value={form.name}
+                    onChange={set("name")}
+                    className={INPUT}
+                  />
+                  {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+                </div>
+
+                {/* Email + Phone row */}
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-[#1A1A1A]">
-                      Full Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={form.name}
-                      onChange={set("name")}
-                      placeholder="Ramesh Kumar"
-                      className={INPUT}
-                    />
-                    {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-[#1A1A1A]">
-                      Email <span className="text-red-500">*</span>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                      Email *
                     </label>
                     <input
                       type="email"
+                      placeholder="you@example.com"
                       value={form.email}
                       onChange={set("email")}
-                      placeholder="you@example.com"
                       className={INPUT}
                     />
                     {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                   </div>
-                </div>
-
-                {/* Phone with +91 prefix */}
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-[#1A1A1A]">
-                    Phone <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex">
-                    <span className="flex items-center rounded-l-xl border border-r-0 border-gray-200 bg-gray-50 px-3 text-sm font-medium text-[#1A1A1A]/50">
-                      +91
-                    </span>
-                    <input
-                      type="tel"
-                      value={form.phone}
-                      onChange={set("phone")}
-                      placeholder="98765 43210"
-                      maxLength={10}
-                      className="w-full rounded-l-none rounded-r-xl border border-gray-200 bg-[#F9FBF9] px-4 py-3 text-sm focus:border-[#1B5E37] focus:outline-none focus:ring-2 focus:ring-[#1B5E37]/20 transition-colors"
-                    />
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                      Phone *
+                    </label>
+                    <div className="flex">
+                      <span className="flex items-center px-3 rounded-l-xl border border-r-0 border-gray-200 bg-gray-50 text-sm text-gray-500 font-medium">
+                        +91
+                      </span>
+                      <input
+                        type="tel"
+                        placeholder="10-digit number"
+                        value={form.phone}
+                        onChange={set("phone")}
+                        maxLength={10}
+                        className={`${INPUT} rounded-l-none`}
+                      />
+                    </div>
+                    {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
                   </div>
-                  {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
                 </div>
 
                 {/* Message */}
                 <div>
-                  <label className="mb-1.5 flex items-center justify-between text-sm font-semibold text-[#1A1A1A]">
-                    <span>Message <span className="text-red-500">*</span></span>
-                    <span className={`text-xs font-normal transition-colors ${form.message.length >= 20 ? "text-[#1B5E37]" : "text-[#1A1A1A]/35"}`}>
-                      {form.message.length} / 20+ chars
-                    </span>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                    Message *
                   </label>
                   <textarea
+                    rows={5}
+                    placeholder="Tell us how we can help you… (min 20 characters)"
                     value={form.message}
                     onChange={set("message")}
-                    rows={5}
-                    placeholder="Tell us about your enquiry, how you&apos;d like to help, or any question you have…"
                     className={`${INPUT} resize-none`}
                   />
-                  {errors.message && <p className="mt-1 text-xs text-red-500">{errors.message}</p>}
+                  <div className="flex items-center justify-between mt-1">
+                    {errors.message
+                      ? <p className="text-xs text-red-500">{errors.message}</p>
+                      : <span />}
+                    <p className="text-xs text-gray-400 ml-auto">{form.message.length} chars</p>
+                  </div>
+                </div>
+
+                {/* How did you find us */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                    How did you find us?
+                  </label>
+                  <select value={form.howFound} onChange={set("howFound")} className={INPUT}>
+                    <option value="">Select…</option>
+                    {HOW_FOUND.map((h) => <option key={h}>{h}</option>)}
+                  </select>
                 </div>
 
                 {/* Submit buttons */}
-                <div className="flex flex-col gap-3 pt-1 sm:flex-row">
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <button
-                    type="button"
                     onClick={handleWhatsApp}
                     disabled={saving}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 text-sm font-bold text-white shadow-md shadow-[#25D366]/20 transition-all hover:bg-[#20BD5C] disabled:opacity-60"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-full py-3 px-6 text-sm font-bold text-white transition-all hover:scale-105 hover:shadow-lg active:scale-100 disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: "#25D366" }}
                   >
-                    <WhatsAppIcon size={18} />
+                    <WhatsAppIcon size={16} />
                     {saving ? "Saving…" : "Send via WhatsApp"}
                   </button>
                   <button
-                    type="button"
                     onClick={handleEmail}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-[#1B5E37] px-5 py-3.5 text-sm font-bold text-[#1B5E37] transition-all hover:bg-[#1B5E37] hover:text-white"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-full py-3 px-6 text-sm font-bold text-white bg-[#1B5E37] transition-all hover:bg-[#0d3320] hover:scale-105 hover:shadow-lg active:scale-100"
                   >
-                    <Mail size={16} />
+                    <Send size={15} />
                     Send via Email
                   </button>
                 </div>
-
-              </form>
+              </div>
             </div>
 
-            {/* RIGHT — Contact Info */}
-            <div className="flex flex-col gap-6">
+            {/* ── Right: Contact info ──────────────────────────────── */}
+            <div className="space-y-6">
+              {/* Info card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7 space-y-6">
+                <h2 className="text-xl font-bold text-[#0F3D22] font-heading">Our Contact Details</h2>
 
-              <div className="glass-light rounded-2xl p-7">
-                <h2 className="mb-6 font-heading text-xl font-bold text-[#0F3D22]">Contact Information</h2>
-
-                <div className="space-y-5">
-
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1B5E37]/10">
-                      <MapPin size={20} className="text-[#1B5E37]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-[#0F3D22]">Address</p>
-                      <p className="mt-0.5 text-sm leading-relaxed text-[#1A1A1A]/65">
-                        Street No.3, Block D, Saraswati Kunj,<br />
-                        Chipyana Khurd, Noida Extension,<br />
-                        UP 201308
-                      </p>
-                      <a
-                        href="https://maps.google.com/?q=Seva+Group+Foundation+Noida+Extension"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-2.5 inline-block rounded-full bg-[#F5A623] px-4 py-1.5 text-xs font-bold text-[#0F3D22] transition-opacity hover:opacity-90"
-                      >
-                        Get Directions →
-                      </a>
-                    </div>
+                {/* Address */}
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#1B5E37]/8 flex items-center justify-center shrink-0">
+                    <MapPin size={18} className="text-[#1B5E37]" />
                   </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1B5E37]/10">
-                      <Phone size={20} className="text-[#1B5E37]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-[#0F3D22]">Phone</p>
-                      <a href="tel:+918287061147" className="mt-0.5 text-sm text-[#1B5E37] underline-offset-2 hover:underline">
-                        +91 82870 61147
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1B5E37]/10">
-                      <Mail size={20} className="text-[#1B5E37]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-[#0F3D22]">Email</p>
-                      <a href="mailto:contact@sevagroupfdn.org" className="mt-0.5 text-sm text-[#1B5E37] underline-offset-2 hover:underline">
-                        contact@sevagroupfdn.org
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1B5E37]/10">
-                      <Clock size={20} className="text-[#1B5E37]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-[#0F3D22]">Office Hours</p>
-                      <p className="mt-0.5 text-sm text-[#1A1A1A]/65">
-                        Monday to Saturday, 10:00 AM – 6:00 PM IST
-                      </p>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              <div className="glass-light rounded-2xl p-6">
-                <p className="mb-4 text-sm font-semibold text-[#0F3D22]">Also Find Us On</p>
-                <div className="flex flex-wrap gap-3">
-                  {[
-                    { name: "WhatsApp",  href: "https://wa.me/918287061147", bg: "bg-[#25D366]"      },
-                    { name: "Facebook",  href: "#",                           bg: "bg-[#1877F2]"      },
-                    { name: "Instagram", href: "#",                           bg: "bg-gradient-to-br from-[#833AB4] to-[#FD1D1D]" },
-                    { name: "YouTube",   href: "#",                           bg: "bg-[#FF0000]"      },
-                  ].map(({ name, href, bg }) => (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Address</p>
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      Street No.3, Block D, Saraswati Kunj,<br />
+                      Chipyana Khurd, Noida Extension,<br />
+                      UP 201308
+                    </p>
                     <a
-                      key={name}
-                      href={href}
+                      href={MAPS_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      title={name}
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-80 ${bg}`}
+                      className="inline-flex items-center gap-1.5 mt-3 bg-[#F5A623] text-[#1B5E37] text-xs font-bold px-4 py-1.5 rounded-full hover:bg-[#F7BA57] transition-colors"
                     >
-                      {name[0]}
+                      <MapPin size={12} />
+                      Get Directions
                     </a>
-                  ))}
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#1B5E37]/8 flex items-center justify-center shrink-0">
+                    <Phone size={18} className="text-[#1B5E37]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Phone</p>
+                    <a
+                      href="tel:+918287061147"
+                      className="text-sm font-semibold text-[#1B5E37] hover:underline"
+                    >
+                      {PHONE_DISPLAY}
+                    </a>
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#1B5E37]/8 flex items-center justify-center shrink-0">
+                    <Mail size={18} className="text-[#1B5E37]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Email</p>
+                    <a
+                      href={`mailto:${EMAIL}`}
+                      className="text-sm font-semibold text-[#1B5E37] hover:underline break-all"
+                    >
+                      {EMAIL}
+                    </a>
+                  </div>
+                </div>
+
+                {/* Hours */}
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#1B5E37]/8 flex items-center justify-center shrink-0">
+                    <Clock size={18} className="text-[#1B5E37]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Office Hours</p>
+                    <p className="text-sm text-gray-700 font-semibold">Monday to Saturday</p>
+                    <p className="text-sm text-gray-600">10:00 AM – 6:00 PM IST</p>
+                    <p className="text-xs text-gray-400 mt-1">Closed on national holidays</p>
+                  </div>
                 </div>
               </div>
 
+              {/* WhatsApp CTA card */}
+              <div
+                className="rounded-2xl p-6 text-white"
+                style={{ backgroundColor: "#25D366" }}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <WhatsAppIcon size={26} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-base leading-snug mb-1">Fastest response on WhatsApp</p>
+                    <p className="text-white/80 text-sm mb-4">
+                      Send us a message directly — our team is active on WhatsApp during office hours and responds within 1 hour.
+                    </p>
+                    <a
+                      href={`${WA_BASE}?text=${encodeURIComponent("Hello, I would like to know more about Seva Group Foundation")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-white text-[#25D366] text-sm font-bold px-5 py-2.5 rounded-full hover:bg-green-50 transition-colors"
+                    >
+                      <WhatsAppIcon size={15} />
+                      Open WhatsApp Chat
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Google Maps embed ────────────────────────────────────── */}
-      <section className="bg-[#F9FBF9] pb-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="overflow-hidden rounded-2xl shadow-lg">
+      {/* ── Google Maps embed ─────────────────────────────────────────── */}
+      <section className="bg-white py-14">
+        <div className="mx-auto max-w-5xl px-4">
+          <h2 className="text-2xl font-bold text-[#0F3D22] font-heading mb-6">Find Us</h2>
+          <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
             <iframe
-              src="https://maps.google.com/maps?q=Chipyana+Khurd+Noida+Extension+Uttar+Pradesh+201308+India&output=embed"
+              title="Seva Group Foundation location"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.8!2d77.4!3d28.62!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNoida+Extension+UP!5e0!3m2!1sen!2sin!4v1"
               width="100%"
               height="380"
-              style={{ border: 0 }}
+              style={{ border: 0, display: "block" }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Seva Group Foundation — Noida Extension Location"
             />
+          </div>
+          <div className="mt-4 flex justify-center">
+            <a
+              href={MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#F5A623] text-[#1B5E37] font-bold text-sm px-6 py-2.5 rounded-full hover:bg-[#F7BA57] transition-all hover:scale-105"
+            >
+              <MapPin size={15} />
+              Open in Google Maps
+            </a>
           </div>
         </div>
       </section>
 
-      {/* ── Volunteer shortcut ───────────────────────────────────── */}
-      <section className="bg-[#1B5E37] py-14">
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#F5A623]">Get Involved</p>
-          <h2 className="mt-3 font-heading text-2xl font-bold text-white">Want to Volunteer?</h2>
-          <p className="mt-2 text-white/60">
-            Register directly and join our 200+ active volunteers across Noida &amp; NCR.
-          </p>
-          <Link
-            href="/volunteer"
-            className="mt-7 inline-block rounded-full bg-[#F5A623] px-8 py-3.5 text-sm font-bold text-[#0F3D22] shadow-lg transition-all hover:scale-105 hover:bg-[#F7BA57]"
-          >
-            Register as Volunteer →
-          </Link>
+      {/* ── Volunteer shortcut card ───────────────────────────────────── */}
+      <section className="bg-[#1B5E37] py-12">
+        <div className="mx-auto max-w-3xl px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
+                <Users size={28} className="text-[#F5A623]" />
+              </div>
+              <div>
+                <p className="text-white font-bold text-lg leading-tight">Want to volunteer?</p>
+                <p className="text-white/70 text-sm mt-0.5">Register directly — no contact form needed</p>
+              </div>
+            </div>
+            <Link
+              href="/volunteer"
+              className="shrink-0 inline-flex items-center gap-2 bg-[#F5A623] text-[#1B5E37] font-bold text-sm px-8 py-3 rounded-full hover:bg-[#F7BA57] transition-all hover:scale-105 shadow-lg"
+            >
+              Register as Volunteer
+            </Link>
+          </div>
         </div>
       </section>
-
     </main>
   );
 }

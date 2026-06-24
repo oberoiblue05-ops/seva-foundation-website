@@ -34,4 +34,14 @@ export const WhatsApp = {
     const msg = `Hello! I represent ${company}. My name is ${contact} and I'd like to explore CSR partnership opportunities with Seva Group Foundation.`;
     return buildWhatsAppUrl(msg);
   },
+
+  shareDonationSuccess(name: string, amount: number, meals: number, children: number): string {
+    const msg =
+      `I just made a difference! 🌟\n\n` +
+      `I donated ${formatCurrency(amount)} to Seva Group Foundation.\n\n` +
+      `This will provide ${meals} meals and support ${children} ${children === 1 ? "child" : "children"}.\n\n` +
+      `Join me in making a difference: https://sevagroupfdn.org/donations\n\n` +
+      `— ${name}`;
+    return buildWhatsAppUrl(msg);
+  },
 };

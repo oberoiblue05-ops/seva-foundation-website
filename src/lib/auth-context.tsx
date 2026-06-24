@@ -1,57 +1,89 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
-import type { UserProfile } from "@/types";
+import {
+  createContext, useContext, useState, useEffect, useCallback,
+  type ReactNode,
+} from "react";
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  type User,
+  type ConfirmationResult,
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AuthContextValue {
-  user: User | null;
-  profile: UserProfile | null;
-  loading: boolean;
-  isAdmin: boolean;
+  user:            User | null;
+  loading:         boolean;
+  isAdmin:         boolean;
+  signInWithPhone: (phone: string, verifier: RecaptchaVerifier) => Promise<ConfirmationResult>;
+  verifyOTP:       (result: ConfirmationResult, otp: string) => Promise<void>;
+  signOut:         () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue>({
-  user: null,
-  profile: null,
-  loading: true,
-  isAdmin: false,
-});
+// ─── Context ──────────────────────────────────────────────────────────────────
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+// ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [user,    setUser]    = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
-
       if (firebaseUser) {
-        const snap = await getDoc(doc(db, "users", firebaseUser.uid));
-        if (snap.exists()) setProfile(snap.data() as UserProfile);
-
-        const tokenResult = await firebaseUser.getIdTokenResult();
-        setIsAdmin(!!tokenResult.claims.admin);
+        try {
+          // Force-refresh so custom claims (admin:true) are always current
+          const token = await firebaseUser.getIdTokenResult(true);
+          setIsAdmin(token.claims.admin === true);
+        } catch {
+          setIsAdmin(false);
+        }
       } else {
-        setProfile(null);
         setIsAdmin(false);
       }
-
       setLoading(false);
     });
+    return unsubscribe;
+  }, []);
 
-    return () => unsubscribe();
+  const signInWithPhone = useCallback(
+    (phone: string, verifier: RecaptchaVerifier) =>
+      signInWithPhoneNumber(auth, phone, verifier),
+    []
+  );
+
+  const verifyOTP = useCallback(
+    async (result: ConfirmationResult, otp: string) => {
+      await result.confirm(otp);
+    },
+    []
+  );
+
+  const signOut = useCallback(async () => {
+    await firebaseSignOut(auth);
+    setIsAdmin(false);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, isAdmin }}>
+    <AuthContext.Provider value={{ user, loading, isAdmin, signInWithPhone, verifyOTP, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+// ─── Hook ─────────────────────────────────────────────────────────────────────
+
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
+  return ctx;
+}

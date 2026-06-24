@@ -8,6 +8,7 @@ import {
   DollarSign, Users, Heart, ShoppingBasket, Briefcase, Calendar, Settings,
   LogOut, Menu, X, ChevronRight,
 } from "lucide-react";
+import Image from "next/image";
 import { useAuth } from "@/lib/auth-context";
 import type { ReactNode } from "react";
 
@@ -53,12 +54,21 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
         style={{ backgroundColor: "#0F3D22" }}
       >
         {/* Brand */}
-        <div className="flex items-center justify-between px-5 py-5 border-b border-white/10">
-          <div>
-            <p className="text-white font-bold text-sm leading-tight">Seva Group</p>
-            <p className="text-white/40 text-xs">Admin Console</p>
+        <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Image
+              src="/seva-logo.png"
+              alt="Seva Group Foundation"
+              width={34}
+              height={34}
+              className="rounded-full shrink-0"
+            />
+            <div className="min-w-0">
+              <p className="text-white font-bold text-sm leading-tight truncate">Seva Group</p>
+              <p className="text-white/40 text-xs">Admin Console</p>
+            </div>
           </div>
-          <button onClick={onClose} className="lg:hidden text-white/50 hover:text-white">
+          <button onClick={onClose} className="lg:hidden text-white/50 hover:text-white shrink-0 ml-2">
             <X size={18} />
           </button>
         </div>

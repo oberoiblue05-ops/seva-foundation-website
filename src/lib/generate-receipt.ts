@@ -67,11 +67,33 @@ function toWords(n: number): string {
   return result.trim() + " Rupees Only";
 }
 
+// ─── Logo loader ─────────────────────────────────────────────────────────────
+
+async function loadLogoBase64(): Promise<string | null> {
+  try {
+    const img = new window.Image();
+    img.crossOrigin = "anonymous";
+    img.src = "/seva-logo.png";
+    await new Promise<void>((res, rej) => {
+      img.onload  = () => res();
+      img.onerror = () => rej();
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width  = img.naturalWidth  || 200;
+    canvas.height = img.naturalHeight || 200;
+    canvas.getContext("2d")!.drawImage(img, 0, 0);
+    return canvas.toDataURL("image/png");
+  } catch {
+    return null;
+  }
+}
+
 // ─── Core jsPDF receipt builder ───────────────────────────────────────────────
 
 async function buildReceiptBlob(d: DonationForReceipt): Promise<Blob> {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const logoBase64 = await loadLogoBase64();
 
   const campaign = d.campaign ?? d.purpose ?? "General Donation";
   const date     = fmtDate(d.createdAt ?? d.timestamp);
@@ -80,6 +102,11 @@ async function buildReceiptBlob(d: DonationForReceipt): Promise<Blob> {
   // ── Green header ──────────────────────────────────────────
   doc.setFillColor(...GREEN);
   doc.rect(0, 0, W, 48, "F");
+
+  // Logo (left side of header)
+  if (logoBase64) {
+    doc.addImage(logoBase64, "PNG", M, 5, 36, 36);
+  }
 
   doc.setTextColor(...WHITE);
   doc.setFont("helvetica", "bold");
@@ -258,6 +285,7 @@ export async function generateDonationReceipt(donation: Donation): Promise<Blob>
 export async function generateSponsorCert(s: SponsorshipForCert): Promise<void> {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const logoBase64 = await loadLogoBase64();
 
   const certNo   = `SPONS-${s.id.slice(-8).toUpperCase()}`;
   const startFmt = fmtDate(s.startDate);
@@ -266,6 +294,11 @@ export async function generateSponsorCert(s: SponsorshipForCert): Promise<void> 
   // Green header
   doc.setFillColor(...GREEN);
   doc.rect(0, 0, W, 55, "F");
+
+  // Logo
+  if (logoBase64) {
+    doc.addImage(logoBase64, "PNG", M, 7, 38, 38);
+  }
 
   doc.setTextColor(...WHITE);
   doc.setFont("helvetica", "bold");

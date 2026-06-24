@@ -15,6 +15,7 @@ export async function generateVolunteerCertificate(
 
   container.innerHTML = `
     <div style="border:4px double #1B5E37;height:100%;padding:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;">
+      <img src="/seva-logo.png" alt="Seva Group Foundation" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px;" />
       <p style="color:#F5A623;font-size:14px;letter-spacing:4px;text-transform:uppercase;margin:0;">Certificate of Appreciation</p>
       <h1 style="color:#1B5E37;font-size:48px;margin:16px 0;">${ORG.name}</h1>
       <p style="font-size:18px;color:#555;margin:0;">This is to certify that</p>

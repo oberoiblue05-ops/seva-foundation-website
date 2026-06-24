@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -86,10 +87,15 @@ export default function Navbar() {
           <div className="flex h-16 items-center justify-between">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <span className="text-[#F5A623]">
-                <LeafIcon />
-              </span>
+            <Link href="/" className="flex items-center gap-2.5 shrink-0">
+              <Image
+                src="/seva-logo.png"
+                alt="Seva Group Foundation"
+                width={44}
+                height={44}
+                className="rounded-full"
+                priority
+              />
               <span className="font-heading text-lg font-bold text-white leading-tight">
                 Seva Group<br />
                 <span className="text-[#F5A623] text-sm font-medium font-sans tracking-wide">Foundation</span>
@@ -396,11 +402,3 @@ function MobileLink({ href, label, active }: { href: string; label: string; acti
   );
 }
 
-function LeafIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z" />
-      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-    </svg>
-  );
-}

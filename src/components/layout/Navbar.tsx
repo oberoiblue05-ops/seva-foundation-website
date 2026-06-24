@@ -10,6 +10,7 @@ import {
   Lock, ChevronDown, Menu, X, MessageCircle,
 } from "lucide-react";
 import { SERVICES, WHATSAPP_LINK } from "@/constants";
+import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -65,6 +66,8 @@ export default function Navbar() {
   const closeDropdown = () => {
     dropdownTimeout.current = setTimeout(() => setActiveDropdown(null), 120);
   };
+
+  const { user, signOut } = useAuth();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -209,6 +212,29 @@ export default function Navbar() {
               >
                 <MessageCircle size={20} />
               </a>
+              {user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="text-white/80 hover:text-white text-sm font-medium transition-colors px-3 py-2 rounded-md hover:bg-white/10"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => signOut()}
+                    className="text-white/70 hover:text-white text-sm transition-colors"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="text-white/80 hover:text-white text-sm font-medium transition-colors px-3 py-2 rounded-md hover:bg-white/10"
+                >
+                  Login
+                </Link>
+              )}
               <Link
                 href="/donations"
                 className="flex items-center gap-1.5 bg-[#F5A623] text-[#1B5E37] font-bold text-sm px-5 py-2 rounded-full transition-all hover:scale-105 hover:bg-[#F7BA57] shadow-md"
@@ -313,6 +339,29 @@ export default function Navbar() {
                 >
                   Donate Now
                 </Link>
+                {user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center justify-center w-full mt-3 border border-white/20 text-white py-2.5 rounded-full text-sm hover:bg-white/10 transition-colors"
+                    >
+                      My Dashboard
+                    </Link>
+                    <button
+                      onClick={() => signOut()}
+                      className="flex items-center justify-center w-full mt-2 text-white/60 hover:text-white py-2 text-sm transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="flex items-center justify-center w-full mt-3 border border-white/20 text-white py-2.5 rounded-full text-sm hover:bg-white/10 transition-colors"
+                  >
+                    Login
+                  </Link>
+                )}
                 <a
                   href={WHATSAPP_LINK}
                   target="_blank"

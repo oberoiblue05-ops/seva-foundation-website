@@ -70,9 +70,37 @@ const PartnerLogos = dynamic(() => import("@/components/home/PartnerLogos"), {
   loading: () => <SectionSkeleton />,
 });
 
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": "NGO",
+  "name": "Seva Group Foundation",
+  "url": "https://sevagroupfdn.org",
+  "logo": "https://sevagroupfdn.org/icon-512.png",
+  "telephone": "+918287061147",
+  "email": "contact@sevagroupfdn.org",
+  "sameAs": [
+    "https://www.facebook.com/sevagroupfdn",
+    "https://www.instagram.com/sevagroupfdn",
+    "https://twitter.com/sevagroupfdn",
+    "https://www.youtube.com/@sevagroupfdn",
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Street No.3, Block D, Saraswati Kunj",
+    "addressLocality": "Noida Extension",
+    "addressRegion": "Uttar Pradesh",
+    "postalCode": "201308",
+    "addressCountry": "IN",
+  },
+};
+
 export default function HomePage() {
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+      />
       <HeroSection />
       <ImpactCounters />
       <MissionSection />

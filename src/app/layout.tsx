@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/lib/auth-context";
+import Analytics from "@/components/Analytics";
 import "./globals.css";
 
 const inter = Inter({
@@ -33,6 +34,12 @@ export const metadata: Metadata = {
     "sponsor a child India",
   ],
   metadataBase: new URL("https://sevagroupfdn.org"),
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Seva NGO",
+  },
   openGraph: {
     title: "Seva Group Foundation | Nourishing Lives, Building Futures",
     description:
@@ -41,12 +48,24 @@ export const metadata: Metadata = {
     siteName: "Seva Group Foundation",
     locale: "en_IN",
     type: "website",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Seva Group Foundation",
     description: "Registered NGO — Noida UP. Donate, volunteer, or sponsor a child.",
   },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1B5E37",
 };
 
 export default function RootLayout({
@@ -78,6 +97,7 @@ export default function RootLayout({
             },
           }}
         />
+        <Analytics />
       </body>
     </html>
   );

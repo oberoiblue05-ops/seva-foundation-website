@@ -34,3 +34,8 @@ export function trackSponsorshipStart(childId: string) {
     items: [{ item_id: childId, item_name: "child_sponsorship", price: 500, currency: "INR" }],
   });
 }
+
+export function trackCSRInquiry() {
+  if (typeof window === "undefined" || !window.gtag) return;
+  window.gtag("event", "csr_inquiry", { event_category: "engagement" });
+}

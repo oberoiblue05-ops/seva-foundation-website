@@ -44,6 +44,15 @@ export default function MissionSection() {
       {/* Decorative blob */}
       <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-[#1B5E37]/5 blur-3xl" />
 
+      {/* Large decorative quote mark */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none select-none absolute left-4 top-8 font-heading font-black leading-none text-[#F5A623]"
+        style={{ fontSize: "14rem", opacity: 0.045 }}
+      >
+        &ldquo;
+      </div>
+
       <div ref={ref} className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <div className="grid items-start gap-16 lg:grid-cols-2">
 

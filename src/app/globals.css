@@ -27,11 +27,15 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.85;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-playfair), Georgia, serif;
 }
+
+/* ── Marquee ─────────────────────────────────────────────────────────── */
 
 @keyframes marquee {
   from { transform: translateX(0); }
@@ -44,4 +48,177 @@ h1, h2, h3, h4, h5, h6 {
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+/* ── Shimmer (hero badge) ─────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s linear infinite;
+}
+
+/* ── Float (hero decorative dots) ────────────────────────────────────── */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+
+.animate-float       { animation: float 5s ease-in-out infinite; }
+.animate-float-slow  { animation: float 7s ease-in-out infinite 1.5s; }
+.animate-float-delay { animation: float 6s ease-in-out infinite 2.5s; }
+
+/* ── Stat glow ────────────────────────────────────────────────────────── */
+
+.stat-glow {
+  text-shadow: 0 0 30px rgba(245, 166, 35, 0.4), 0 0 60px rgba(245, 166, 35, 0.15);
+}
+
+/* ── Pulsing ring (Donate Now button) ────────────────────────────────── */
+
+@keyframes pingEvery3s {
+  0%, 55%, 100% { transform: scale(1); opacity: 0; }
+  5%  { transform: scale(1);   opacity: 0.55; }
+  50% { transform: scale(1.55); opacity: 0; }
+}
+
+.animate-ping-slow {
+  animation: pingEvery3s 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ── Underline slide (nav links) ─────────────────────────────────────── */
+
+.nav-underline {
+  position: relative;
+}
+
+.nav-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #F5A623;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 2px;
+}
+
+.nav-underline:hover::after {
+  width: 100%;
+}
+
+/* ── Premium card ─────────────────────────────────────────────────────── */
+
+.card-premium {
+  background: linear-gradient(145deg, #ffffff, #F9FBF9);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 0 12px 24px rgba(27, 94, 55, 0.06);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-premium:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(27, 94, 55, 0.15);
+  border-color: rgba(245, 166, 35, 0.3);
+}
+
+/* ── Background patterns ──────────────────────────────────────────────── */
+
+.diagonal-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.04) 0px,
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(27, 94, 55, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.dot-pattern {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+/* ── Image hover zoom ─────────────────────────────────────────────────── */
+
+.img-zoom {
+  overflow: hidden;
+}
+
+.img-zoom img {
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.img-zoom:hover img,
+.img-zoom:hover > div > img {
+  transform: scale(1.04);
+}
+
+/* ── Gold button ──────────────────────────────────────────────────────── */
+
+.btn-gold {
+  background: linear-gradient(135deg, #F5A623 0%, #E8930F 100%);
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(245, 166, 35, 0.45);
+}
+
+/* ── Floating label inputs ────────────────────────────────────────────── */
+
+.floating-group { position: relative; }
+
+.floating-group label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.875rem;
+  color: #9ca3af;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  transform-origin: left center;
+  background: transparent;
+  padding: 0 4px;
+}
+
+.floating-group input:focus + label,
+.floating-group input:not(:placeholder-shown) + label,
+.floating-group textarea:focus + label,
+.floating-group textarea:not(:placeholder-shown) + label {
+  transform: translateY(-2.1rem) scale(0.75);
+  color: #1B5E37;
+  background: white;
+}
+
+.floating-group input,
+.floating-group textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.925rem;
+  outline: none;
+  transition: border-color 0.2s;
+  background: white;
+}
+
+.floating-group input:focus,
+.floating-group textarea:focus {
+  border-color: #1B5E37;
 }

@@ -12,20 +12,37 @@ export default function WhatsAppButton() {
       title="Chat with us on WhatsApp"
       className="group fixed bottom-6 right-6 z-[9999] flex items-center justify-center"
     >
-      {/* Pulse rings */}
-      <span className="absolute inline-flex h-14 w-14 rounded-full bg-[#25D366] opacity-40 animate-ping" />
-      <span className="absolute inline-flex h-14 w-14 rounded-full bg-[#25D366] opacity-20 animate-ping [animation-delay:0.5s]" />
+      {/* Breathing pulse rings */}
+      <span
+        className="absolute inline-flex h-[60px] w-[60px] rounded-full bg-[#25D366] opacity-35"
+        style={{ animation: "breathe 2.4s ease-in-out infinite" }}
+      />
+      <span
+        className="absolute inline-flex h-[68px] w-[68px] rounded-full bg-[#25D366] opacity-18"
+        style={{ animation: "breathe 2.4s ease-in-out infinite 0.4s" }}
+      />
+      <span
+        className="absolute inline-flex h-[78px] w-[78px] rounded-full bg-[#25D366] opacity-10"
+        style={{ animation: "breathe 2.4s ease-in-out infinite 0.8s" }}
+      />
 
       {/* Button */}
-      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] shadow-lg shadow-[#25D366]/40 transition-transform duration-200 group-hover:scale-110">
+      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] shadow-lg shadow-[#25D366]/50 transition-all duration-200 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-[#25D366]/60">
         <WhatsAppSVG />
       </span>
 
       {/* Tooltip */}
-      <span className="absolute right-16 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 pointer-events-none">
+      <span className="absolute right-[68px] whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 pointer-events-none">
         Chat with us on WhatsApp
         <span className="absolute right-[-4px] top-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-900" />
       </span>
+
+      <style>{`
+        @keyframes breathe {
+          0%, 100% { transform: scale(1); opacity: 0.35; }
+          50% { transform: scale(1.22); opacity: 0; }
+        }
+      `}</style>
     </a>
   );
 }

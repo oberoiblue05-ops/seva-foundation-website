@@ -12,32 +12,99 @@ const BADGES = [
   { Icon: TreePine,    value: `${IMPACT_STATS.trees}+`,                      label: "Trees Planted"   },
 ];
 
+interface Dot {
+  size: number;
+  top?: string;
+  left?: string;
+  right?: string;
+  bottom?: string;
+  delay: number;
+  duration: number;
+  opacity: number;
+}
+
+const DOTS: Dot[] = [
+  { size: 14, top: "16%",  left: "7%",   delay: 0,   duration: 5.5, opacity: 0.25 },
+  { size: 8,  top: "30%",  right: "11%", delay: 1.2, duration: 6.5, opacity: 0.18 },
+  { size: 18, bottom: "28%", left: "13%", delay: 2,   duration: 7,   opacity: 0.14 },
+  { size: 6,  top: "55%",  right: "22%", delay: 0.7, duration: 5,   opacity: 0.20 },
+  { size: 10, bottom: "18%", right: "7%", delay: 1.8, duration: 6,  opacity: 0.16 },
+  { size: 5,  top: "70%",  left: "40%",  delay: 0.4, duration: 8,   opacity: 0.12 },
+];
+
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-[#081F0F] via-[#1B5E37] to-[#2A6B45]">
-      {/* Background decorations */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-[#F5A623]/10 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-[600px] w-[600px] rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0F3D22]/60 blur-3xl" />
-        <svg className="absolute right-8 top-8 h-64 w-64 text-white/[0.04]" viewBox="0 0 200 200" fill="currentColor">
-          <path d="M100 10C150 10 190 50 190 100c0 50-40 90-90 90C100 150 60 120 20 100c40-20 80-50 80-90z" />
-        </svg>
-        <svg className="absolute bottom-12 left-8 h-48 w-48 rotate-180 text-white/[0.03]" viewBox="0 0 200 200" fill="currentColor">
-          <path d="M100 10C150 10 190 50 190 100c0 50-40 90-90 90C100 150 60 120 20 100c40-20 80-50 80-90z" />
-        </svg>
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+
+      {/* Base dark green gradient */}
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(145deg, #050f07 0%, #0a1e10 25%, #0d2e18 55%, #1B5E37 100%)" }}
+      />
+
+      {/* Animated blob 1 — gold warm orb */}
+      <motion.div
+        animate={{ scale: [1, 1.18, 1], opacity: [0.25, 0.4, 0.25] }}
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-40 -left-40 w-[640px] h-[640px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(245,166,35,0.14) 0%, transparent 68%)" }}
+      />
+
+      {/* Animated blob 2 — green depth */}
+      <motion.div
+        animate={{ scale: [1.1, 1, 1.1], opacity: [0.18, 0.3, 0.18] }}
+        transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 2.5 }}
+        className="absolute -bottom-48 -right-48 w-[760px] h-[760px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(27,94,55,0.45) 0%, transparent 68%)" }}
+      />
+
+      {/* Animated blob 3 — shifting mid orb */}
+      <motion.div
+        animate={{ x: [0, 28, -18, 0], y: [0, -18, 14, 0], opacity: [0.08, 0.18, 0.08] }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+        className="absolute top-1/3 left-1/3 w-[420px] h-[420px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%)" }}
+      />
+
+      {/* Dot pattern overlay */}
+      <div className="absolute inset-0 dot-pattern pointer-events-none opacity-30" />
+
+      {/* Floating gold circles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {DOTS.map((dot, i) => (
+          <motion.div
+            key={i}
+            animate={{ y: ["0%", "-22%", "0%"] }}
+            transition={{ duration: dot.duration, repeat: Infinity, ease: "easeInOut", delay: dot.delay }}
+            className="absolute rounded-full bg-[#F5A623]"
+            style={{
+              width:   dot.size,
+              height:  dot.size,
+              top:     dot.top,
+              left:    dot.left,
+              right:   dot.right,
+              bottom:  dot.bottom,
+              opacity: dot.opacity,
+            }}
+          />
+        ))}
       </div>
 
+      {/* ── Main content ─────────────────────────────────────────────── */}
       <div className="relative z-10 mx-auto max-w-5xl px-4 py-24 text-center sm:px-6">
-        {/* Top pill */}
+
+        {/* Shimmer badge */}
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm text-white/90 backdrop-blur-sm"
+          className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/8 px-5 py-2.5 text-white/90 backdrop-blur-sm overflow-hidden relative"
         >
-          <span className="h-2 w-2 animate-pulse rounded-full bg-[#F5A623]" />
-          Registered NGO · Noida, UP · Serving Since 2018
+          <span className="absolute inset-0 pointer-events-none -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+          <span className="relative z-10 h-2 w-2 rounded-full bg-[#F5A623] animate-pulse" />
+          <span className="relative z-10 text-[11px] font-bold uppercase tracking-[0.18em]">
+            Registered NGO · Noida, UP · Serving Since 2018
+          </span>
         </motion.div>
 
         {/* Main headline */}
@@ -45,7 +112,12 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.12, ease: "easeOut" }}
-          className="mb-6 font-heading text-4xl font-bold leading-[1.1] text-white sm:text-5xl lg:text-[4.25rem]"
+          className="mb-5 font-heading font-bold text-white"
+          style={{
+            fontSize:   "clamp(2.6rem, 7.5vw, 5.2rem)",
+            lineHeight: 1.05,
+            textShadow: "0 2px 24px rgba(0,0,0,0.45), 0 0 60px rgba(0,0,0,0.2)",
+          }}
         >
           Transforming Lives,
           <br />
@@ -53,15 +125,25 @@ export default function HeroSection() {
           <em className="not-italic text-[#F5A623]">Seva</em> at a Time
         </motion.h1>
 
+        {/* Gold accent line under headline */}
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ duration: 0.9, delay: 0.32, ease: "easeOut" }}
+          className="mx-auto mb-7 h-[2px] w-28 origin-center"
+          style={{ background: "linear-gradient(90deg, transparent, #F5A623 50%, transparent)" }}
+        />
+
         {/* Sub-headline */}
         <motion.p
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.24, ease: "easeOut" }}
-          className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-white/75 sm:text-xl"
+          className="mx-auto mb-11 max-w-2xl leading-[1.85] text-white/72 sm:text-xl"
+          style={{ fontSize: "clamp(1rem, 2.2vw, 1.2rem)" }}
         >
           Supporting{" "}
-          <span className="font-medium text-white">
+          <span className="font-semibold text-white">
             orphaned children, semi-orphans, cancer families,
           </span>{" "}
           widows, street children, and the elderly — because every life deserves dignity and love.
@@ -76,13 +158,19 @@ export default function HeroSection() {
         >
           <Link
             href="/donations"
-            className="min-w-[168px] rounded-full bg-[#F5A623] px-8 py-4 text-base font-bold text-[#0F3D22] shadow-lg shadow-[#F5A623]/30 transition-all hover:scale-105 hover:bg-[#F7BA57] active:scale-95"
+            className="relative min-w-[188px] rounded-full px-9 py-4 text-base font-bold text-[#0F3D22] transition-all hover:scale-105 hover:-translate-y-1 active:scale-95"
+            style={{
+              background:   "linear-gradient(135deg, #F5A623 0%, #E8930F 100%)",
+              boxShadow:    "0 8px 32px rgba(245,166,35,0.45)",
+              letterSpacing: "0.03em",
+              textShadow:   "0 1px 2px rgba(0,0,0,0.1)",
+            }}
           >
             Donate Now
           </Link>
           <a
             href="#our-story"
-            className="flex min-w-[168px] items-center justify-center gap-3 rounded-full border-2 border-white/30 px-8 py-4 text-base text-white transition-all hover:bg-white/10"
+            className="flex min-w-[188px] items-center justify-center gap-3 rounded-full border-2 border-white/28 px-9 py-4 text-base text-white transition-all hover:bg-white/10 hover:-translate-y-1 backdrop-blur-sm"
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
               <Play size={13} fill="white" />
@@ -91,18 +179,26 @@ export default function HeroSection() {
           </a>
         </motion.div>
 
-        {/* Trust badges */}
+        {/* Trust badges — glassmorphism pills */}
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.5, ease: "easeOut" }}
-          className="grid grid-cols-2 gap-6 border-t border-white/10 pt-10 sm:grid-cols-4 sm:gap-8"
+          className="flex flex-wrap justify-center gap-3"
         >
           {BADGES.map(({ Icon, value, label }) => (
-            <div key={label} className="flex flex-col items-center gap-2">
-              <Icon size={22} className="text-[#F5A623]" />
-              <span className="font-heading text-2xl font-bold text-white sm:text-3xl">{value}</span>
-              <span className="text-[11px] uppercase tracking-widest text-white/50">{label}</span>
+            <div
+              key={label}
+              className="flex items-center gap-3 rounded-full border border-white/15 px-5 py-3 backdrop-blur-sm"
+              style={{ background: "rgba(255,255,255,0.07)" }}
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F5A623]/20">
+                <Icon size={16} className="text-[#F5A623]" />
+              </div>
+              <div className="text-left">
+                <span className="block font-heading text-lg font-extrabold text-white leading-tight">{value}</span>
+                <span className="block text-[10px] font-semibold uppercase tracking-widest text-white/50">{label}</span>
+              </div>
             </div>
           ))}
         </motion.div>
@@ -113,16 +209,16 @@ export default function HeroSection() {
         href="#impact"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.4 }}
-        className="absolute bottom-8 flex flex-col items-center gap-1 text-white/40 transition-colors hover:text-white/70"
+        transition={{ delay: 1.5 }}
+        className="absolute bottom-8 flex flex-col items-center gap-2 text-white/40 transition-colors hover:text-white/70"
         aria-label="Scroll down"
       >
-        <span className="text-[10px] uppercase tracking-widest">Scroll</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.22em]">Scroll to explore</span>
         <motion.span
-          animate={{ y: [0, 6, 0] }}
+          animate={{ y: [0, 9, 0] }}
           transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
         >
-          <ChevronDown size={18} />
+          <ChevronDown size={20} />
         </motion.span>
       </motion.a>
     </section>

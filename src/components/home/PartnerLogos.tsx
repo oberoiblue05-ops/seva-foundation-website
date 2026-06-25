@@ -26,7 +26,7 @@ export default function PartnerLogos() {
             {doubled.map((partner, i) => (
               <div
                 key={`${partner.abbr}-${i}`}
-                className="flex h-16 w-36 shrink-0 flex-col items-center justify-center rounded-xl border border-[#1B5E37]/10 bg-[#F9FBF9] transition-all hover:border-[#1B5E37]/30 hover:bg-white hover:shadow-sm"
+                className="flex h-16 w-36 shrink-0 flex-col items-center justify-center rounded-xl border border-[#1B5E37]/10 bg-[#F9FBF9] transition-all duration-300 hover:border-[#1B5E37]/30 hover:bg-white hover:shadow-md grayscale opacity-55 hover:grayscale-0 hover:opacity-100 hover:-translate-y-1"
                 title={partner.name}
               >
                 <span className="font-heading text-base font-bold text-[#1B5E37]">

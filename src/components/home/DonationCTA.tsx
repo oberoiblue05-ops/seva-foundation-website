@@ -75,8 +75,11 @@ export default function DonationCTA() {
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
-    <section className="bg-[#1B5E37] py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+    <section className="relative bg-[#1B5E37] py-20 overflow-hidden">
+      {/* Diagonal stripe texture */}
+      <div className="absolute inset-0 diagonal-stripes pointer-events-none" />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -110,7 +113,7 @@ export default function DonationCTA() {
               variants={card}
               className={`group flex flex-col rounded-2xl border p-7 transition-all duration-300 ${bg} ${border}`}
             >
-              <div className={`mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl ${iconBg}`}>
+              <div className={`mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg ${iconBg}`}>
                 <Icon size={26} className="text-white" />
               </div>
 
@@ -119,7 +122,7 @@ export default function DonationCTA() {
 
               <Link
                 href={href}
-                className={`block rounded-full py-2.5 text-center text-sm font-bold transition-all hover:opacity-90 hover:shadow-lg ${ctaClass}`}
+                className={`block rounded-full py-2.5 text-center text-sm font-bold transition-all hover:opacity-90 hover:shadow-lg hover:scale-105 hover:-translate-y-0.5 active:scale-95 ${ctaClass}`}
               >
                 {cta}
               </Link>

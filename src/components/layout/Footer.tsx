@@ -1,31 +1,73 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import { SOCIAL_LINKS, ORG, WHATSAPP_LINK } from "@/constants";
+import toast from "react-hot-toast";
 
 const QUICK_LINKS = [
-  { label: "Home", href: "/" },
-  { label: "About Us", href: "/about" },
-  { label: "Services", href: "/services/orphanage" },
-  { label: "Gallery", href: "/gallery" },
-  { label: "Blog", href: "/news" },
-  { label: "Legal", href: "/legal" },
+  { label: "Home",       href: "/" },
+  { label: "About Us",   href: "/about" },
+  { label: "Services",   href: "/services/orphanage" },
+  { label: "Gallery",    href: "/gallery" },
+  { label: "Blog",       href: "/news" },
+  { label: "Legal",      href: "/legal" },
   { label: "Donor Wall", href: "/donor-wall" },
 ];
 
 const GET_INVOLVED = [
-  { label: "Volunteer", href: "/volunteer" },
+  { label: "Volunteer",       href: "/volunteer" },
   { label: "Sponsor a Child", href: "/sponsor" },
-  { label: "Donate Groceries", href: "/donate-groceries" },
-  { label: "Corporate CSR", href: "/csr" },
-  { label: "Donate Now", href: "/donations" },
+  { label: "Donate Groceries",href: "/donate-groceries" },
+  { label: "Corporate CSR",   href: "/csr" },
+  { label: "Donate Now",      href: "/donations" },
 ];
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !email.includes("@")) {
+      toast.error("Enter a valid email address.");
+      return;
+    }
+    toast.success("Subscribed! Thank you for staying connected.");
+    setEmail("");
+  };
 
   return (
-    <footer className="bg-[#1B5E37] text-white">
+    <footer className="bg-[#1B5E37] text-white border-t-2 border-[#F5A623]/60">
+
+      {/* ── Newsletter strip ── */}
+      <div className="bg-[#0F3D22] border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div>
+            <h3 className="font-heading font-bold text-white text-lg leading-tight">Stay Updated</h3>
+            <p className="text-white/55 text-sm mt-0.5">Monthly impact reports and project updates — no spam</p>
+          </div>
+          <form onSubmit={handleSubscribe} className="flex gap-2 w-full sm:w-auto">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Your email address"
+              className="flex-1 sm:w-60 bg-white/10 border border-white/20 rounded-full px-4 py-2.5 text-white text-sm placeholder:text-white/38 outline-none focus:border-[#F5A623] transition-colors"
+            />
+            <button
+              type="submit"
+              className="btn-gold text-[#0F3D22] font-bold px-5 py-2.5 rounded-full text-sm shrink-0"
+            >
+              Subscribe
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* ── Main footer ── */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
@@ -47,22 +89,22 @@ export default function Footer() {
             <p className="text-[#F5A623] font-heading italic text-base">
               &ldquo;Nourishing Lives, Building Futures&rdquo;
             </p>
-            <p className="text-white/70 text-sm leading-relaxed">
+            <p className="text-white/65 text-sm leading-relaxed">
               A registered NGO dedicated to uplifting orphaned children, elderly citizens, widows,
               and vulnerable communities across Noida, UP since 2018.
             </p>
-            <div className="flex items-center gap-3 pt-1">
-              <SocialLink href={SOCIAL_LINKS.facebook} label="Facebook" icon={<FacebookSVG />} />
-              <SocialLink href={SOCIAL_LINKS.instagram} label="Instagram" icon={<InstagramSVG />} />
-              <SocialLink href={SOCIAL_LINKS.twitter} label="Twitter / X" icon={<TwitterSVG />} />
-              <SocialLink href={SOCIAL_LINKS.youtube} label="YouTube" icon={<YoutubeSVG />} />
-              <SocialLink href={SOCIAL_LINKS.linkedin} label="LinkedIn" icon={<LinkedinSVG />} />
+            <div className="flex items-center gap-2.5 pt-1">
+              <SocialLink href={SOCIAL_LINKS.facebook}  label="Facebook"  icon={<FacebookSVG />}  hoverClass="hover:bg-[#1877F2]" />
+              <SocialLink href={SOCIAL_LINKS.instagram} label="Instagram" icon={<InstagramSVG />} hoverClass="hover:bg-[#E1306C]" />
+              <SocialLink href={SOCIAL_LINKS.twitter}   label="Twitter/X" icon={<TwitterSVG />}   hoverClass="hover:bg-black" />
+              <SocialLink href={SOCIAL_LINKS.youtube}   label="YouTube"   icon={<YoutubeSVG />}   hoverClass="hover:bg-[#FF0000]" />
+              <SocialLink href={SOCIAL_LINKS.linkedin}  label="LinkedIn"  icon={<LinkedinSVG />}  hoverClass="hover:bg-[#0A66C2]" />
             </div>
           </div>
 
           {/* Col 2 — Quick Links */}
           <div>
-            <h3 className="font-heading font-semibold text-[#F5A623] text-base mb-5 uppercase tracking-wide">
+            <h3 className="font-heading font-bold text-[#F5A623] text-sm mb-5 uppercase tracking-widest">
               Quick Links
             </h3>
             <ul className="space-y-2.5">
@@ -70,9 +112,9 @@ export default function Footer() {
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="text-white/70 hover:text-white text-sm transition-colors flex items-center gap-2 group"
+                    className="text-white/65 hover:text-white text-sm transition-colors flex items-center gap-2 group"
                   >
-                    <span className="w-1 h-1 rounded-full bg-[#F5A623] group-hover:w-2 transition-all" />
+                    <span className="w-1 h-1 rounded-full bg-[#F5A623] group-hover:w-2.5 transition-all duration-200" />
                     {l.label}
                   </Link>
                 </li>
@@ -82,7 +124,7 @@ export default function Footer() {
 
           {/* Col 3 — Get Involved */}
           <div>
-            <h3 className="font-heading font-semibold text-[#F5A623] text-base mb-5 uppercase tracking-wide">
+            <h3 className="font-heading font-bold text-[#F5A623] text-sm mb-5 uppercase tracking-widest">
               Get Involved
             </h3>
             <ul className="space-y-2.5">
@@ -90,9 +132,9 @@ export default function Footer() {
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="text-white/70 hover:text-white text-sm transition-colors flex items-center gap-2 group"
+                    className="text-white/65 hover:text-white text-sm transition-colors flex items-center gap-2 group"
                   >
-                    <span className="w-1 h-1 rounded-full bg-[#F5A623] group-hover:w-2 transition-all" />
+                    <span className="w-1 h-1 rounded-full bg-[#F5A623] group-hover:w-2.5 transition-all duration-200" />
                     {l.label}
                   </Link>
                 </li>
@@ -102,18 +144,18 @@ export default function Footer() {
 
           {/* Col 4 — Contact */}
           <div>
-            <h3 className="font-heading font-semibold text-[#F5A623] text-base mb-5 uppercase tracking-wide">
+            <h3 className="font-heading font-bold text-[#F5A623] text-sm mb-5 uppercase tracking-widest">
               Contact Us
             </h3>
             <ul className="space-y-4">
               <li className="flex gap-3">
                 <MapPin size={16} className="text-[#F5A623] shrink-0 mt-0.5" />
-                <span className="text-white/70 text-sm leading-relaxed">{ORG.address}</span>
+                <span className="text-white/65 text-sm leading-relaxed">{ORG.address}</span>
               </li>
               <li>
                 <a
                   href={`tel:${ORG.phone.replace(/\s/g, "")}`}
-                  className="flex items-center gap-3 text-white/70 hover:text-white text-sm transition-colors group"
+                  className="flex items-center gap-3 text-white/65 hover:text-white text-sm transition-colors group"
                 >
                   <Phone size={16} className="text-[#F5A623] group-hover:text-white transition-colors" />
                   {ORG.phone}
@@ -122,7 +164,7 @@ export default function Footer() {
               <li>
                 <a
                   href={`mailto:${ORG.email}`}
-                  className="flex items-center gap-3 text-white/70 hover:text-white text-sm transition-colors group"
+                  className="flex items-center gap-3 text-white/65 hover:text-white text-sm transition-colors group"
                 >
                   <Mail size={16} className="text-[#F5A623] group-hover:text-white transition-colors" />
                   {ORG.email}
@@ -133,13 +175,13 @@ export default function Footer() {
                   href={WHATSAPP_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-white/70 hover:text-[#25D366] text-sm transition-colors group"
+                  className="flex items-center gap-3 text-white/65 hover:text-[#25D366] text-sm transition-colors group"
                 >
                   <WhatsAppMiniSVG />
                   Chat on WhatsApp
                 </a>
               </li>
-              <li className="flex items-center gap-3 text-white/70 text-sm">
+              <li className="flex items-center gap-3 text-white/65 text-sm">
                 <Clock size={16} className="text-[#F5A623] shrink-0" />
                 Mon – Sat, 10:00 AM – 6:00 PM
               </li>
@@ -148,14 +190,18 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar */}
+      {/* ── Bottom bar with watermark ── */}
       <div className="bg-[#0F3D22] py-4">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center">
-          <p className="text-white/60 text-xs">
-            &copy; {year} Seva Group Foundation &mdash; Registered NGO
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center">
+          {/* Watermark logo */}
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 opacity-[0.06] pointer-events-none hidden sm:block">
+            <Image src="/seva-logo.png" alt="" width={36} height={36} className="rounded-full" />
+          </div>
+          <p className="text-white/55 text-xs">
+            &copy; {year} Seva Group Foundation &mdash; Registered NGO, Noida UP
           </p>
-          <p className="text-white/40 text-xs">
-            Designed with ♥ for social good
+          <p className="text-white/35 text-xs">
+            Crafted with ♥ for social good
           </p>
         </div>
       </div>
@@ -163,14 +209,14 @@ export default function Footer() {
   );
 }
 
-function SocialLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
+function SocialLink({ href, label, icon, hoverClass }: { href: string; label: string; icon: React.ReactNode; hoverClass: string }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-[#F5A623] hover:text-[#1B5E37] transition-all duration-200"
+      className={`flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:scale-110 ${hoverClass}`}
     >
       {icon}
     </a>
@@ -186,41 +232,21 @@ function WhatsAppMiniSVG() {
 }
 
 function FacebookSVG() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-    </svg>
-  );
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>;
 }
 
 function InstagramSVG() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-    </svg>
-  );
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>;
 }
 
 function TwitterSVG() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  );
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>;
 }
 
 function YoutubeSVG() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-    </svg>
-  );
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg>;
 }
 
 function LinkedinSVG() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-    </svg>
-  );
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>;
 }

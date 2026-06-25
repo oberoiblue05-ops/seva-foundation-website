@@ -46,6 +46,10 @@ const MissionSection = dynamic(() => import("@/components/home/MissionSection"),
   loading: () => <SectionSkeleton />,
 });
 
+const WhyChoseSeva = dynamic(() => import("@/components/home/WhyChoseSeva"), {
+  loading: () => <SectionSkeleton />,
+});
+
 const LatestActivities = dynamic(() => import("@/components/home/LatestActivities"), {
   loading: () => <SectionSkeleton dark />,
 });
@@ -104,6 +108,7 @@ export default function HomePage() {
       <HeroSection />
       <ImpactCounters />
       <MissionSection />
+      <WhyChoseSeva />
       <LatestActivities />
       <YouTubeSection />
       <DonationCTA />

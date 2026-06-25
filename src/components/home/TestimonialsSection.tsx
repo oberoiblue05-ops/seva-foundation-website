@@ -98,7 +98,10 @@ export default function TestimonialsSection() {
               className="glass-light glass-hover flex flex-col rounded-2xl p-8"
             >
               {/* Quote mark */}
-              <span className="mb-4 block font-heading text-6xl leading-none text-[#1B5E37]/15">
+              <span
+                className="mb-1 block font-heading leading-none text-[#F5A623]"
+                style={{ fontSize: "6rem", opacity: 0.15 }}
+              >
                 &ldquo;
               </span>
 

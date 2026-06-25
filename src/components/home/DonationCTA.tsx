@@ -34,9 +34,9 @@ const CARDS = [
   },
   {
     Icon: ShoppingBasket,
-    title: "Donate Groceries",
+    title: "🧺 Donate Groceries",
     description:
-      "Join our monthly grocery drives. Pledge dry rations and essential supplies for needy families.",
+      "Monthly drives at our Noida Extension centre. Pledge rice, dal, oil, and essentials — or donate Rs.200 for a family grocery bag.",
     cta: "Pledge Now",
     href: "/donate-groceries",
     accent: "#4CAF50",

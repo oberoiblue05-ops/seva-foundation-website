@@ -6,7 +6,7 @@ import { collection, addDoc, doc, updateDoc, serverTimestamp } from "firebase/fi
 import Image from "next/image";
 import { db } from "@/lib/firebase";
 import { generateSponsorCert } from "@/lib/generate-receipt";
-import { trackSponsorshipStart } from "@/lib/track-conversion";
+import { trackDonationConversion } from "@/lib/track-conversion";
 import { ORG } from "@/constants";
 
 // ─── Razorpay types ───────────────────────────────────────────────────────────
@@ -185,6 +185,7 @@ export default function SponsorModal({
               startDate:          new Date().toISOString(),
               status:             "active",
               isActive:           true,
+              paymentHistory:     [],
               razorpayOrderId:    response.razorpay_order_id,
               razorpayPaymentId:  response.razorpay_payment_id,
               createdAt:          serverTimestamp(),
@@ -195,7 +196,7 @@ export default function SponsorModal({
               await updateDoc(doc(db, "children", child.id), { isSponsored: true });
             } catch { /* child doc may not exist in Firestore — non-fatal */ }
 
-            trackSponsorshipStart(child.id);
+            trackDonationConversion(500, response.razorpay_payment_id);
             setSavedId(docRef.id);
             setStep("success");
           } catch (verifyErr) {

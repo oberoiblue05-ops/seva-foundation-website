@@ -636,7 +636,9 @@ function SponsorshipsTab({ sponsorships }: { sponsorships: FirestoreSponsorship[
     <div className="space-y-4">
       <p className="text-sm text-[#1A1A1A]/50">{sponsorships.length} sponsorship(s)</p>
       {sponsorships.map((s) => {
-        const child = CHILDREN.find((c) => c.id === s.childId);
+        const child   = CHILDREN.find((c) => c.id === s.childId);
+        const months  = monthsDiff(new Date(s.startDate), new Date());
+        const total   = months * s.amount;
         return (
           <div key={s.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="flex items-center gap-4 p-4">
@@ -658,9 +660,14 @@ function SponsorshipsTab({ sponsorships }: { sponsorships: FirestoreSponsorship[
                 <p className="text-sm text-[#1A1A1A]/50 mt-0.5">
                   {fmtRs(s.amount)}/month · Since {fmtDate(s.startDate)}
                 </p>
-                {child?.age && (
-                  <p className="text-xs text-[#1A1A1A]/40 capitalize">{child.age} years · {child.category}</p>
-                )}
+                <div className="flex items-center gap-3 mt-1.5">
+                  <span className="text-xs bg-[#1B5E37]/10 text-[#1B5E37] px-2 py-0.5 rounded-full font-medium">
+                    {months} month{months !== 1 ? "s" : ""} active
+                  </span>
+                  <span className="text-xs text-[#1A1A1A]/40">
+                    {fmtRs(total)} contributed
+                  </span>
+                </div>
               </div>
             </div>
             <div className="px-4 pb-4">
@@ -807,13 +814,15 @@ function DashboardContent() {
           setDonations(dsnap.docs.map((d) => ({ id: d.id, ...d.data() } as FirestoreDonation)));
         }
 
-        // Sponsorships — by uid
-        const sq = query(
-          collection(db, "sponsorships"),
-          where("sponsorId", "==", user!.uid)
-        );
-        const ssnap = await getDocs(sq);
-        setSponsorships(ssnap.docs.map((d) => ({ id: d.id, ...d.data() } as FirestoreSponsorship)));
+        // Sponsorships — by phone number (matches what SponsorModal saves)
+        if (phone) {
+          const sq = query(
+            collection(db, "sponsorships"),
+            where("phone", "==", phone),
+          );
+          const ssnap = await getDocs(sq);
+          setSponsorships(ssnap.docs.map((d) => ({ id: d.id, ...d.data() } as FirestoreSponsorship)));
+        }
       } catch (err) {
         // Silently degrade (missing index, no permissions, etc.)
         console.warn("[dashboard]", err);

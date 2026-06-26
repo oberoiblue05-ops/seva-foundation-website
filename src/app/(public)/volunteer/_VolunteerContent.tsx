@@ -164,7 +164,7 @@ export default function VolunteerContent() {
         appliedAt:      serverTimestamp(),
         createdAt:      new Date().toISOString(),
       });
-      trackVolunteerSignup();
+      trackVolunteerSignup(form.volunteerType);
       setSavedName(form.name.trim());
       setSubmitted(true);
       setForm(BLANK);

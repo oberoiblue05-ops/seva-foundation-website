@@ -44,4 +44,23 @@ export const WhatsApp = {
       `— ${name}`;
     return buildWhatsAppUrl(msg);
   },
+
+  shareVolunteerJoined(name: string): string {
+    const msg =
+      `I just joined Seva Group Foundation as a volunteer! 🙌\n\n` +
+      `Together we can feed children, support the elderly, and build a better community.\n\n` +
+      `Join us: https://sevagroupfdn.org/volunteer\n\n` +
+      `— ${name}`;
+    return buildWhatsAppUrl(msg);
+  },
+
+  shareFestivalCampaign(festival: string, link: string): string {
+    const msg =
+      `This ${festival}, let's give more than just sweets. 🌟\n\n` +
+      `Seva Group Foundation is running a special campaign to feed orphaned children, support widows, and help elderly citizens in need.\n\n` +
+      `Your donation — big or small — makes a real difference.\n\n` +
+      `Donate now: ${link}\n\n` +
+      `#SevaGroupFoundation #${festival.replace(/\s+/g, "")} #NGOIndia #DonateNow`;
+    return buildWhatsAppUrl(msg);
+  },
 };

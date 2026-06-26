@@ -144,9 +144,9 @@ export default function HeroSection() {
         >
           Supporting{" "}
           <span className="font-semibold text-white">
-            orphaned children, semi-orphans, cancer families,
+            orphaned children, semi-orphans, cancer families, widows, street children, and the elderly
           </span>{" "}
-          widows, street children, and the elderly — because every life deserves dignity and love.
+          — because every life deserves dignity and love.
         </motion.p>
 
         {/* CTA buttons */}

@@ -174,7 +174,7 @@ export default function CSRContent() {
         submittedAt: new Date().toISOString(),
         createdAt:   serverTimestamp(),
       });
-      trackCSRInquiry();
+      trackCSRInquiry(form.company, form.budget);
 
       const waText = encodeURIComponent(
         `Hello Seva Group Foundation! I am ${form.contact} from ${form.company} (${form.designation}). ` +

@@ -72,8 +72,13 @@ const CHILDREN_CARDS = [
     iconBg: "bg-[#F59E0B]/10",
     bulletBg: "bg-[#F59E0B]",
     Icon: Heart,
-    desc: "Children who have lost one parent and live with a surviving parent struggling to make ends meet.",
-    help: ["Daily nutritious meals", "After-school tutoring", "Grief counselling support"],
+    desc: "Children who lost one parent — the surviving parent struggles to provide basics. Often unsupervised, at risk of dropping out of school.",
+    help: [
+      "Daily meals and nutritious food",
+      "After-school tutoring",
+      "Grief counselling and emotional support",
+      "School fees and uniform support",
+    ],
   },
   {
     title: "Accidental Orphans",
@@ -82,8 +87,13 @@ const CHILDREN_CARDS = [
     iconBg: "bg-[#EF4444]/10",
     bulletBg: "bg-[#EF4444]",
     Icon: AlertTriangle,
-    desc: "Children whose parents died in road or workplace accidents, left with no immediate support system.",
-    help: ["Emergency shelter within 72 hrs", "Trauma counselling", "Full education support"],
+    desc: "Children whose parents died in road or workplace accidents. They face sudden poverty and psychological trauma with no time to prepare.",
+    help: [
+      "Emergency shelter within 72 hours",
+      "Trauma counselling and therapy",
+      "Full education and nutrition support",
+      "Long-term guardianship assistance",
+    ],
   },
   {
     title: "Children of Cancer-Affected Parents",
@@ -92,8 +102,13 @@ const CHILDREN_CARDS = [
     iconBg: "bg-[#8B5CF6]/10",
     bulletBg: "bg-[#8B5CF6]",
     Icon: Activity,
-    desc: "Families bankrupted by cancer treatment, children pulled from school to help earn or care for the sick parent.",
-    help: ["School fees & stationery", "Home tutoring sessions", "Meals & family counselling"],
+    desc: "When a parent is diagnosed with cancer, families exhaust savings on treatment. Children are pulled from school — invisible victims of a devastating illness.",
+    help: [
+      "School fees during parent's treatment",
+      "Free tutoring and daily meals",
+      "Psychological counselling",
+      "Family financial emergency support",
+    ],
   },
   {
     title: "Children from Prisoner Families",
@@ -102,8 +117,13 @@ const CHILDREN_CARDS = [
     iconBg: "bg-[#64748B]/10",
     bulletBg: "bg-[#64748B]",
     Icon: Shield,
-    desc: "Children facing social stigma and isolation due to a parent's incarceration — often invisible to welfare systems.",
-    help: ["Confidential enrolment", "Education & skill support", "Social worker mentorship"],
+    desc: "When a parent goes to prison, children face stigma, economic crisis, and social isolation. Society should not punish the child for the parent's actions.",
+    help: [
+      "Confidential enrolment — no stigma",
+      "Education and uniform support",
+      "Mentorship from trained social workers",
+      "Safe after-school environment",
+    ],
   },
 ];
 

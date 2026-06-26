@@ -3,6 +3,8 @@ import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/lib/auth-context";
 import Analytics from "@/components/Analytics";
+import FestivalBanner from "@/components/FestivalBanner";
+import GoogleAds from "@/components/GoogleAds";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,15 +25,20 @@ export const metadata: Metadata = {
     template: "%s | Seva Group Foundation",
   },
   description:
-    "Registered NGO serving orphaned children, elderly, widows in NCR since 2018. Donate, volunteer or sponsor a child today.",
+    "Registered NGO in Noida UP serving orphaned children, semi-orphans, cancer families, widows and the elderly since 2018. Donate, volunteer or sponsor a child — 80G tax exemption.",
   keywords: [
     "NGO India",
+    "NGO Noida",
     "Seva Group Foundation",
     "donate India",
     "orphan support Noida",
     "charity UP India",
     "volunteer Noida",
     "sponsor a child India",
+    "80G tax exemption",
+    "cancer family support NGO",
+    "semi-orphan support",
+    "food donation drive Noida",
   ],
   metadataBase: new URL("https://sevagroupfdn.org"),
   manifest: "/manifest.json",
@@ -43,7 +50,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Seva Group Foundation | Nourishing Lives, Building Futures",
     description:
-      "Registered NGO serving orphaned children, elderly & widows in NCR since 2018.",
+      "Registered NGO serving orphaned children, widows & the elderly in NCR since 2018. 80G tax exempt. Donate, volunteer, or sponsor a child.",
     url: "https://sevagroupfdn.org",
     siteName: "Seva Group Foundation",
     locale: "en_IN",
@@ -53,7 +60,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Seva Group Foundation",
-    description: "Registered NGO — Noida UP. Donate, volunteer, or sponsor a child.",
+    description: "Registered NGO — Noida UP. Donate, volunteer, or sponsor a child. 80G tax exempt.",
   },
   icons: {
     icon: "/favicon.ico",
@@ -73,6 +80,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-text">
+        <FestivalBanner />
         <AuthProvider>
           {children}
         </AuthProvider>
@@ -95,6 +103,7 @@ export default function RootLayout({
           }}
         />
         <Analytics />
+        <GoogleAds />
       </body>
     </html>
   );

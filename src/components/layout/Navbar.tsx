@@ -8,7 +8,7 @@ import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Home, Users, Heart, BookOpen, Utensils, Stethoscope,
   TreePine, UserCheck, Gift, HeartHandshake, Shield, Ribbon,
-  Lock, ChevronDown, Menu, X, MessageCircle,
+  Lock, ChevronDown, Menu, X, MessageCircle, HandHeart, ShoppingBasket, Briefcase,
 } from "lucide-react";
 import { SERVICES, WHATSAPP_LINK } from "@/constants";
 import { useAuth } from "@/lib/auth-context";
@@ -20,21 +20,28 @@ const ICON_MAP: Record<string, React.ElementType> = {
 };
 
 const DONATE_LINKS = [
-  { label: "Donate Money",    href: "/donations",        icon: Gift },
-  { label: "Sponsor a Child", href: "/sponsor",          icon: Heart },
-  { label: "Donate Groceries",href: "/donate-groceries", icon: Utensils },
-  { label: "Corporate CSR",   href: "/csr",              icon: Users },
+  { label: "💰 Donate Money",    href: "/donations",        icon: Gift },
+  { label: "👶 Sponsor a Child", href: "/sponsor",          icon: Heart },
+  { label: "🛒 Donate Groceries",href: "/donate-groceries", icon: ShoppingBasket },
+  { label: "🤝 Volunteer",       href: "/volunteer",        icon: HandHeart },
+];
+
+const GET_INVOLVED_LINKS = [
+  { label: "🤝 Volunteer With Us",  href: "/volunteer",        icon: HandHeart },
+  { label: "👶 Sponsor a Child",    href: "/sponsor",          icon: Heart },
+  { label: "🛒 Donate Groceries",   href: "/donate-groceries", icon: ShoppingBasket },
+  { label: "🏢 Corporate CSR",      href: "/csr",              icon: Briefcase },
 ];
 
 const NAV_ITEMS = [
-  { label: "Home",      href: "/" },
-  { label: "About",     href: "/about" },
-  { label: "Services",  href: "#", hasDropdown: "services" as const },
-  { label: "Gallery",   href: "/gallery" },
-  { label: "Blog",      href: "/news" },
-  { label: "Donate",    href: "#", hasDropdown: "donate" as const },
-  { label: "Volunteer", href: "/volunteer" },
-  { label: "Contact",   href: "/contact" },
+  { label: "Home",          href: "/" },
+  { label: "About",         href: "/about" },
+  { label: "Services",      href: "#", hasDropdown: "services"  as const },
+  { label: "Gallery",       href: "/gallery" },
+  { label: "Blog",          href: "/news" },
+  { label: "Get Involved",  href: "#", hasDropdown: "involved"  as const },
+  { label: "Donate",        href: "#", hasDropdown: "donate"    as const },
+  { label: "Contact",       href: "/contact" },
 ];
 
 const mobileContainerV: Variants = {
@@ -51,7 +58,7 @@ export default function Navbar() {
   const pathname  = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<"services" | "donate" | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<"services" | "donate" | "involved" | null>(null);
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -67,7 +74,7 @@ export default function Navbar() {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const openDropdown = (key: "services" | "donate") => {
+  const openDropdown = (key: "services" | "donate" | "involved") => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
     setActiveDropdown(key);
   };
@@ -116,7 +123,7 @@ export default function Navbar() {
                 <div
                   key={navItem.label}
                   className="relative"
-                  onMouseEnter={() => navItem.hasDropdown && openDropdown(navItem.hasDropdown)}
+                  onMouseEnter={() => navItem.hasDropdown && openDropdown(navItem.hasDropdown as "services" | "donate" | "involved")}
                   onMouseLeave={() => navItem.hasDropdown && closeDropdown()}
                 >
                   {navItem.hasDropdown ? (
@@ -192,6 +199,32 @@ export default function Navbar() {
                     )}
                   </AnimatePresence>
 
+                  {/* Get Involved dropdown */}
+                  <AnimatePresence>
+                    {navItem.hasDropdown === "involved" && activeDropdown === "involved" && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.18 }}
+                        className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 rounded-2xl glass-light shadow-2xl p-2 border border-white/20"
+                        onMouseEnter={() => openDropdown("involved")}
+                        onMouseLeave={closeDropdown}
+                      >
+                        {GET_INVOLVED_LINKS.map((d) => (
+                          <Link
+                            key={d.href}
+                            href={d.href}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/5 transition-colors group"
+                          >
+                            <d.icon size={16} className="text-primary group-hover:text-accent transition-colors" />
+                            <span className="text-sm text-text/80 group-hover:text-primary">{d.label}</span>
+                          </Link>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* Donate dropdown */}
                   <AnimatePresence>
                     {navItem.hasDropdown === "donate" && activeDropdown === "donate" && (
@@ -200,7 +233,7 @@ export default function Navbar() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute right-0 top-full mt-2 w-52 rounded-2xl glass-light shadow-2xl p-2 border border-white/20"
+                        className="absolute right-0 top-full mt-2 w-56 rounded-2xl glass-light shadow-2xl p-2 border border-white/20"
                         onMouseEnter={() => openDropdown("donate")}
                         onMouseLeave={closeDropdown}
                       >
@@ -355,7 +388,7 @@ export default function Navbar() {
                   <p className="text-[#F5A623] text-xs font-bold uppercase tracking-widest px-3 mb-2">
                     Get Involved
                   </p>
-                  {DONATE_LINKS.map((d) => (
+                  {GET_INVOLVED_LINKS.map((d) => (
                     <Link
                       key={d.href}
                       href={d.href}
@@ -367,8 +400,20 @@ export default function Navbar() {
                   ))}
                 </motion.div>
 
-                <motion.div variants={mobileItemV}>
-                  <MobileLink href="/volunteer" label="Volunteer" active={isActive("/volunteer")} />
+                <motion.div variants={mobileItemV} className="pt-1 pb-1">
+                  <p className="text-[#F5A623] text-xs font-bold uppercase tracking-widest px-3 mb-2">
+                    Donate
+                  </p>
+                  {DONATE_LINKS.map((d) => (
+                    <Link
+                      key={d.href}
+                      href={d.href}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 text-sm transition-colors min-h-[44px]"
+                    >
+                      <d.icon size={14} className="text-[#F5A623] shrink-0" />
+                      {d.label}
+                    </Link>
+                  ))}
                 </motion.div>
                 <motion.div variants={mobileItemV}>
                   <MobileLink href="/contact" label="Contact" active={isActive("/contact")} />

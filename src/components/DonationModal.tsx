@@ -6,6 +6,7 @@ import { X, CheckCircle2, Download, AlertTriangle, Loader2 } from "lucide-react"
 import toast from "react-hot-toast";
 import type { Donation } from "@/types";
 import { generateDonationReceipt } from "@/lib/generate-receipt";
+import { trackDonation } from "@/lib/track-conversion";
 import { ORG } from "@/constants";
 
 // ─── Razorpay checkout types ──────────────────────────────────────────────────
@@ -274,6 +275,7 @@ export default function DonationModal({
               amountRs,
               campaign:  campaignTitle,
             });
+            trackDonation(amountRs, campaignTitle);
             setStep("success");
             setConfetti(true);
             toast.success("🎉 Payment successful! Thank you for your donation.");

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import VolunteerContent from "./_VolunteerContent";
 
 export const metadata: Metadata = {
-  title: "Volunteer with Seva Group Foundation | NGO Noida UP",
+  title: "Volunteer With Seva Group Foundation | NGO Noida",
   description:
-    "Volunteer with Seva Group Foundation — registered NGO in Noida UP. Join food camps, education drives, medical camps, and tree plantations. On-site, events, and remote skill volunteering. Join 200+ volunteers.",
+    "Join 200+ volunteers making a difference in Noida. On-site, events, or remote skills. Register as a volunteer for Seva Group Foundation today.",
   keywords: [
     "volunteer NGO Noida",
     "volunteer India NGO",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "Seva Group Foundation volunteer",
   ],
   openGraph: {
-    title: "Volunteer with Seva Group Foundation | NGO Noida UP",
+    title: "Volunteer With Seva Group Foundation | NGO Noida",
     description:
       "Join food camps, education drives, and medical camps in Noida Extension. On-site, events, and remote volunteering — all welcome.",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],

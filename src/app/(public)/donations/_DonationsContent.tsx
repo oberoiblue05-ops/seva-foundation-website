@@ -304,7 +304,7 @@ export default function DonationsPage() {
           </nav>
           <div className="max-w-2xl">
             <h1 className="font-heading text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
-              Support a Life Today
+              Donate to Seva Group Foundation
             </h1>
             <p className="mt-4 text-lg leading-relaxed text-white/70">
               Every rupee you give feeds a child, funds a school seat, or runs a medical camp.

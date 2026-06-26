@@ -4,7 +4,7 @@ import DonationsContent from "./_DonationsContent";
 export const metadata: Metadata = {
   title: "Donate to Seva Group Foundation | NGO Noida | 80G Tax Exempt",
   description:
-    "Donate to Seva Group Foundation — registered NGO in Noida UP. Support orphan care, food relief, education, and medical camps. 80G tax exemption. One-time or monthly via Razorpay UPI/card.",
+    "Donate online to Seva Group Foundation. All donations are 80G tax exempt. Support orphaned children, free medical camps, and feeding programmes in Noida.",
   keywords: [
     "donate NGO India",
     "donate Noida",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Donate to Seva Group Foundation | NGO Noida | 80G Tax Exempt",
     description:
-      "Support orphan care, food relief, cancer families, education & more. 80G tax exemption available. Donate via UPI or card.",
+      "All donations 80G tax exempt. Support orphaned children, medical camps, and feeding programmes in Noida. Razorpay UPI/card.",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image" },

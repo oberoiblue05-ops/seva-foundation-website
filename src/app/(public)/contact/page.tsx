@@ -2,13 +2,20 @@ import type { Metadata } from "next";
 import ContactContent from "./_ContactContent";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Seva Group Foundation",
+  title: "Contact Seva Group Foundation | NGO Noida | +91 82870 61147",
   description:
-    "Get in touch with Seva Group Foundation. WhatsApp, email, or visit us at Saraswati Kunj, Noida Extension, UP 201308.",
+    "Contact Seva Group Foundation in Noida Extension. WhatsApp, email, or call. Mon-Sat 10AM-6PM. Street No.3, Saraswati Kunj, Noida Extension UP 201308.",
+  keywords: [
+    "contact Seva Group Foundation",
+    "NGO Noida contact",
+    "charity Noida Extension address",
+    "donate Noida contact",
+    "volunteer Noida phone",
+  ],
   openGraph: {
-    title: "Contact Seva Group Foundation",
+    title: "Contact Seva Group Foundation | NGO Noida | +91 82870 61147",
     description:
-      "WhatsApp, email, or visit our centre at Saraswati Kunj, Noida Extension.",
+      "WhatsApp us at +91 82870 61147, email contact@sevagroupfdn.org, or visit Street No.3, Saraswati Kunj, Noida Extension UP 201308.",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image" },

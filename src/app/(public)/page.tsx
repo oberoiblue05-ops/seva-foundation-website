@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 
 export const metadata: Metadata = {
-  title: "Seva Group Foundation | Nourishing Lives, Building Futures",
+  title: "Seva Group Foundation | NGO Noida | Donate to Help Children",
   description:
-    "Registered NGO in Noida, UP serving orphaned children, semi-orphans, cancer families, widows, street children, and the elderly since 2018. Donate, volunteer, or sponsor a child today.",
+    "Seva Group Foundation is a registered NGO in Noida serving orphaned children, semi-orphans, elderly, and widows since 2018. Donate online — 80G tax exempt.",
   keywords: [
     "NGO Noida",
     "donate India",
@@ -14,11 +14,13 @@ export const metadata: Metadata = {
     "charity NCR",
     "Seva Group Foundation",
     "80G tax exemption donation",
+    "semi-orphan support Noida",
+    "cancer family NGO",
   ],
   openGraph: {
-    title: "Seva Group Foundation — Nourishing Lives, Building Futures",
+    title: "Seva Group Foundation | NGO Noida | Donate to Help Children",
     description:
-      "Serving orphaned children, widows & the elderly in NCR since 2018. Donate, volunteer, or sponsor a child.",
+      "Registered NGO in Noida serving orphaned children, semi-orphans, elderly, and widows since 2018. Donate online — 80G tax exempt.",
     images: [{ url: "/og-home.jpg", width: 1200, height: 630 }],
   },
 };
